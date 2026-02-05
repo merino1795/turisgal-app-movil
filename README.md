@@ -1,91 +1,153 @@
-Turisgal - App Móvil de Gestión Turística
-Aplicación móvil desarrollada en Flutter para la gestión integral de reservas, check-in digital y servicios turísticos, respaldada por un backend en Node.js con Prisma ORM y PostgreSQL.
-📋 Características Principales
--Módulo Móvil (Flutter)
-  -Autenticación Segura: Login, registro, recuperación de contraseña y actualización de credenciales.
-  -Check-in Digital:Escaneo de QR para validación de reservas (mobile_scanner).
-  -Verificación de identidad (OCR) mediante carga de documentos.
-  -Firma digital manuscrita en pantalla.
-  -Gestión de Reservas: Visualización de reservas activas e históricas.
-  -Check-out Automatizado: Reporte de salida con carga de evidencia fotográfica (incidencias, estado del inmueble).
-  -Geolocalización: Mapas interactivos con flutter_map para ubicación de propiedades.
-  -Comunicación: Chat integrado con soporte/anfitrión.
-  -Perfil: Gestión de datos de usuario.
--Módulo Backend (Node.js)
-  -API REST: Arquitectura modular con Express.js.
-  -ORM: Prisma para modelado y migración de base de datos (PostgreSQL).
-  -OCR: Procesamiento de imágenes con tesseract.js para validación de documentos.
-  -Seguridad: Hashing con bcrypt, JWT para sesiones y middleware de autenticación.
-  -Uploads: Gestión de archivos (fotos de check-out, documentos) con multer.
-🛠 Tech Stack
--Frontend (App Móvil)
-  -Framework: Flutter (SDK ^3.9.2)
-  -Lenguaje: Dart
-  -Gestión de Estado: Provider
-  -Almacenamiento Local: Shared Preferences, Flutter Secure Storage
-  -Librerías Clave: http, intl, image_picker, url_launcher, latlong2.
--Backend (API)
-  -Runtime: Node.js
-  -Framework: Express.js
-  -Lenguaje: JavaScript / TypeScript
-  -Base de Datos: PostgreSQL
-  -ORM: Prisma
-  -OCR Engine: Tesseract.js
-🚀 Instalación y Configuración
-Sigue estos pasos en orden para levantar el entorno de desarrollo completo.
-1. Requisitos Previos
-   -Flutter SDK instalado y configurado en el PATH.
-   -Node.js (v18+ recomendado).
-   -PostgreSQL corriendo localmente o una instancia en la nube.
-   -Dispositivo físico o emulador (Android/iOS).
-2. Configuración del Backend (turigal-backend)
-   1. Navega al directorio del servidor:Bashcd turigal-backend
-   2. Instala las dependencias:Bashnpm install
-   3. Configura las variables de entorno. Crea un archivo .env en la raíz de turigal-backend con el siguiente contenido (ajusta según tu entorno):
-      Fragmento de código
-        PORT=3000
-        DATABASE_URL="postgresql://usuario:password@localhost:5432/turisgal_db?schema=public"
-        JWT_SECRET="tu_clave_secreta_jwt"
-        # Añadir credenciales de correo si usas nodemailer
-    4. Ejecuta las migraciones de Prisma para crear las tablas (User, Reservation, Checkin, etc.):
-       Bash
-         npx prisma migrate dev --name init
-     5. Inicia el servidor en modo desarrollo:
-        Bash
-          npm run start:dev
-        El servidor debería estar corriendo en http://localhost:3000.
-3. Configuración del Frontend (/)
-  1. Vuelve a la raíz del proyecto y asegura las dependencias de Flutter:
-     Bash
-       flutter pub get
-  3. Configuración de API URL:Verifica el archivo lib/services/api_service.dart. Si estás probando en un emulador Android, asegúrate de que la URL base apunte a tu backend local.
-       Emulador Android: http://10.0.2.2:3000/api
-       iOS / Físico: http://<TU_IP_LOCAL>:3000/api
-  4. Ejecuta la aplicación:
-     Bash
-       flutter run
-📂 Estructura del Proyecto
-Frontend (lib/)
-  -main.dart: Punto de entrada. Inicialización de servicios y rutas.
-  -services/: Lógica de negocio y comunicación HTTP (auth_service.dart, api_service.dart, checkin_service.dart).
-  -widgets/: Componentes reutilizables (qr_scanner.dart, signature_page.dart, formularios).
-  -*.dart: Pantallas principales en la raíz de lib/ (login_page.dart, home_page.dart, etc.).
-Backend (turigal-backend/)
-  -server.js: Entry point. Configuración de middlewares y rutas.
-  -prisma/schema.prisma: Definición de modelos de BD (User, Checkin, Reservation, Review).
-  -controllers/: Lógica de los endpoints.
-  -routes/: Definición de rutas de la API.
-  -middleware/: Middleware de autenticación (auth_middleware.js).
-📡 Endpoints Principales (API)
-    Método | Endpoint | Descripción
-    AUTH | /api/auth/login | Iniciar sesión y obtener JWT.
-    AUTH | /api/auth/register | Registrar nuevo usuario.
-    CHECKIN | /api/checkin/validate | Validar reserva mediante QR/ID.
-    CHECKIN | /api/checkin/ocr | Subir doc de identidad para análisis OCR.
-    RESERVAS | /api/reservations | Listar reservas del usuario.
-    CHECKOUT | /api/checkout | Finalizar estancia y subir fotos.
-⚠️ Notas de Desarrollo
-  -Assets: Las imágenes deben estar en assets/images/. Recuerda que pubspec.yaml ya incluye la referencia a esta carpeta.
-  -Permisos:
-    -Android: Revisa AndroidManifest.xml para permisos de Cámara (QR/Fotos), Internet y Geolocalización.
-     -iOS: Revisa Info.plist para las claves NSCameraUsageDescription, NSPhotoLibraryUsageDescription y NSLocationWhenInUseUsageDescription.
+<div align="center">
+
+# 🏰 Turisgal App
+
+<p>
+  <b>Aplicación Integral de Gestión Turística y Check-in Digital</b>
+</p>
+
+<p>
+  <a href="#-características">Características</a> •
+  <a href="#-tecnologías">Tecnologías</a> •
+  <a href="#-instalación">Instalación</a> •
+  <a href="#-api-endpoints">API</a>
+</p>
+
+![Flutter](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)
+![NodeJS](https://img.shields.io/badge/Node.js-43853D?style=for-the-badge&logo=node.js&logoColor=white)
+![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?style=for-the-badge&logo=postgresql&logoColor=white)
+
+</div>
+
+---
+
+## 📋 Descripción del Proyecto
+
+**Turisgal** es una solución móvil desarrollada en **Flutter** para la gestión de alojamientos turísticos, permitiendo a los usuarios gestionar sus reservas y realizar procesos de check-in digital avanzados (OCR y firma). El sistema está respaldado por una API RESTful robusta construida con **Node.js**, **Express** y **Prisma**.
+
+## 📱 Características Principales
+
+### Módulo Móvil (Frontend)
+- **Autenticación Segura:** Login, Registro, Recuperación de contraseña y Gestión de perfil (`auth_service.dart`).
+- **Check-in Digital Avanzado:**
+  - 📷 **OCR:** Escaneo y validación de documentos de identidad (`identity_verification_page.dart`).
+  - ✍️ **Firma Digital:** Captura de firma manuscrita en pantalla (`signature_page.dart`).
+  - 🔍 **Escáner QR:** Validación rápida de reservas (`mobile_scanner`).
+- **Gestión de Reservas:** Visualización de reservas activas, pasadas y detalles de la propiedad (`my_reservation_screen.dart`).
+- **Check-out:** Reporte de salida con evidencia fotográfica de incidencias (`check-out.dart`).
+- **Geolocalización:** Mapas interactivos con OpenStreetMap (`flutter_map`).
+
+### Módulo Servidor (Backend)
+- **API REST:** Estructura modular con controladores y rutas separadas (`server.js`).
+- **ORM Prisma:** Gestión de base de datos PostgreSQL con modelos relacionales (`User`, `Reservation`, `Checkin`).
+- **Procesamiento de Imágenes:** Integración con `tesseract.js` para extracción de datos de DNI/Pasaportes.
+- **Seguridad:** Autenticación JWT y hash de contraseñas con Bcrypt.
+
+---
+
+## 🛠 Tecnologías (Tech Stack)
+
+### 📱 Cliente (Mobile)
+* **Framework:** Flutter SDK ^3.9.2
+* **Lenguaje:** Dart
+* **Estado:** Provider
+* **Mapas:** `flutter_map` & `latlong2`
+* **Almacenamiento:** `flutter_secure_storage`, `shared_preferences`
+
+### 🖥️ Servidor (Backend)
+* **Runtime:** Node.js
+* **Framework:** Express.js
+* **Base de Datos:** PostgreSQL
+* **ORM:** Prisma Client
+* **OCR:** Tesseract.js
+
+---
+
+## 🚀 Guía de Instalación
+
+Sigue estos pasos para desplegar el entorno de desarrollo localmente.
+
+### 1. Configuración del Backend
+
+Navega a la carpeta del servidor:
+
+```bash
+cd turigal-backend
+```
+
+Instala las dependencias y genera el cliente de Prisma:
+
+```bash
+npm install
+npx prisma generate
+```
+
+Configura las variables de entorno creando un archivo `.env` en `turigal-backend/` (ejemplo):
+
+```env
+PORT=3000
+DATABASE_URL="postgresql://user:password@localhost:5432/turisgal_db"
+JWT_SECRET="tusecreto"
+```
+
+Ejecuta las migraciones y lanza el servidor:
+
+```bash
+npx prisma migrate dev --name init
+npm run start:dev
+```
+
+### 2. Configuración de la App Móvil
+
+Vuelve a la raíz del proyecto e instala dependencias de Flutter:
+
+```bash
+cd ..
+flutter pub get
+```
+
+Configura la IP de tu API en `lib/services/api_service.dart`.
+* **Emulador:** `http://10.0.2.2:3000/api`
+* **Dispositivo Físico:** `http://TU_IP_LOCAL:3000/api`
+
+Ejecuta la aplicación:
+
+```bash
+flutter run
+```
+
+---
+
+## 📂 Estructura de Directorios
+
+```text
+turisgal-app/
+├── lib/
+│   ├── main.dart             # Entry point y Rutas
+│   ├── services/             # Lógica de negocio (Auth, API)
+│   ├── widgets/              # Componentes UI (Inputs, Scanner)
+│   └── ...                   # Pantallas (Login, Home, Checkin)
+│
+├── turigal-backend/
+│   ├── prisma/
+│   │   └── schema.prisma     # Definición de la BD
+│   ├── controllers/          # Lógica de endpoints
+│   ├── routes/               # Definición de rutas API
+│   └── server.js             # Configuración del servidor
+```
+
+---
+
+## 📡 API Endpoints
+
+| Método | Endpoint | Descripción |
+| :--- | :--- | :--- |
+| **POST** | `/api/auth/login` | Iniciar sesión (Devuelve JWT) |
+| **POST** | `/api/checkin/validate` | Validar código de reserva |
+| **POST** | `/api/checkin/ocr` | Subir DNI para extracción de datos |
+| **GET** | `/api/reservations` | Listar reservas del usuario |
+| **POST** | `/api/checkout` | Finalizar estancia y subir fotos |
+
+---
+
+<br>
