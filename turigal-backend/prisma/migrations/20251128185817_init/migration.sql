@@ -1,0 +1,6 @@
+-- AlterTable
+ALTER TABLE "ResetPasswordToken" ADD COLUMN     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+ALTER COLUMN "token" DROP NOT NULL;
+
+-- AlterTable
+ALTER TABLE "Usuario" ALTER COLUMN "apellido" DROP NOT NULL;

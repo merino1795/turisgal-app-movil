@@ -1,0 +1,136 @@
+
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Turigal - Splash y Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            overflow: hidden; 
+        }
+        /* Contenedor principal de la aplicación centrado */
+        #app-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100vw;
+            padding: 1rem;
+        }
+
+        /* Estilos específicos para el Splash Screen */
+        #splash-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #0077b6; /* Azul profundo de la marca Turigal */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 1;
+            /* Transición suave al desaparecer */
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out; 
+            z-index: 1000;
+        }
+
+        #splash-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none; 
+        }
+
+        /* Estilos para el logo de imagen */
+        .logo-image {
+            width: 150px; /* Tamaño fijo del logo */
+            height: 150px;
+            display: flex;
+            align-items: center;
+            justify-content: center; /* Asegura que la imagen se ajuste sin distorsionarse */
+            border-radius: 20%; /* Bordes redondeados sutiles */
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            animation: growIn 0.8s ease-out;
+            background-color: white;
+        }
+
+        @keyframes growIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Estilos para la pantalla de Login */
+        #login-screen {
+            background-color: white;
+            width: 100%;
+            max-width: 400px;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+
+    <!-- 1. SPLASH SCREEN (La primera pantalla que aparece) -->
+    <div id="splash-screen">
+        <!-- USAMOS UN SVG INTEGRADO (NO UNA IMAGEN LOCAL) PARA QUE LA PREVISUALIZACIÓN FUNCIONE -->
+        <div class="logo-container">
+            <svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 24 24" fill="none" stroke="#0077b6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map-pin">
+                <path d="M12 17.5l-3.3-3.3a5 5 0 1 1 6.6 0l-3.3 3.3z"/><circle cx="12" cy="10" r="2.5"/>
+            </svg>
+        </div>
+
+        <p class="text-white mt-8 text-xl font-medium opacity-90">Turigal</p>
+ 
+    </div>
+
+    <!-- 2. LOGIN SCREEN (El contenido que se revela) -->
+    <div id="app-container">
+        <div id="login-screen">
+            <h2 class="text-3xl font-extrabold text-center text-gray-900 mb-8">Bienvenido</h2>
+            
+            <form onsubmit="event.preventDefault(); /* Aquí va su lógica de autenticación */">
+                <div class="mb-5">
+                    <label for="email" class="block text-sm font-medium text-gray-700 mb-2">Correo Electrónico</label>
+                    <input type="email" id="email" name="email" placeholder="usuario@turigal.com" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                </div>
+                <div class="mb-6">
+                    <label for="password" class="block text-sm font-medium text-gray-700 mb-2">Contraseña</label>
+                    <input type="password" id="password" name="password" placeholder="••••••••" required
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500 transition duration-150">
+                </div>
+                <button type="submit"
+                    class="w-full bg-blue-600 text-white font-semibold py-3 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md">
+                    Iniciar Sesión
+                </button>
+            </form>
+            <div class="mt-6 text-center">
+                <a href="#" class="text-sm font-medium text-blue-600 hover:text-blue-800">¿Olvidaste tu contraseña?</a>
+                <p class="text-sm text-gray-500 mt-2">¿Nuevo usuario? <a href="#" class="text-blue-600 hover:text-blue-800 font-medium">Regístrate</a></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const splashScreen = document.getElementById('splash-screen');
+            
+            // Duración del Splash Screen en milisegundos (2.5 segundos)
+            const SPLASH_DURATION = 3000; 
+
+            setTimeout(() => {
+                // Oculta la pantalla de inicio con una transición suave
+                splashScreen.classList.add('hidden');
+            }, SPLASH_DURATION);
+        });
+    </script>
+</body>
+</html>

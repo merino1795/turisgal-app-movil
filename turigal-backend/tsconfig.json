@@ -1,0 +1,15 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "nodenext", // Volver a CommonJS para simplificar la resolución
+    "moduleResolution": "nodenext", // Usar la resolución estándar de Node
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true, // Permite importar módulos CommonJS como default
+    "strict": true,
+    "skipLibCheck": true,
+    "outDir": "./dist",
+    "rootDir": "./"
+  },
+  "include": ["**/*.ts", "routes/review.routes.js", "routes/reservation.routes.js", "routes/public.routes.js", "routes/password.routes.js", "routes/contact.routes.js", "routes/checkout.routes.js", "routes/checkin.routes.js", "routes/chat.routes.js", "routes/auth.routes.js", "server.js"], 
+  "exclude": ["node_modules", "dist"]
+}

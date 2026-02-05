@@ -1,0 +1,187 @@
+// Configuración de la base de datos
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Generador del cliente
+generator client {
+  provider = "prisma-client-js"
+}
+
+// ==========================================================
+// 1. MODELO DE USUARIO (Renombrado de Usuario a User)
+// ==========================================================
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  password  String
+  
+  // Campos personales (coinciden con auth_controller.js)
+  nombre    String
+  apellido  String
+  telefono  String   @unique // Opcional: Quitar @unique si permites repetir teléfono
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // RELACIONES
+  resetTokens  ResetPasswordToken[]
+  reservations Reservation[]
+  reviews      Review[]
+  chatMessages ChatMessage[] // 🛑 NUEVO: Para saber qué mensajes escribió el usuario
+  
+  // Mapeamos el nombre de la tabla en BD a "usuario" si prefieres mantener la tabla vieja
+  @@map("users") 
+}
+
+// ==========================================================
+// 2. MODELO DE RESETEO DE CONTRASEÑA
+// ==========================================================
+model ResetPasswordToken {
+  id         Int      @id @default(autoincrement())
+  token      String   @unique // El PIN o Token
+  
+  userId     Int
+  user       User     @relation(fields: [userId], references: [id])
+  
+  isVerified Boolean  @default(false) 
+  resetKey   String?  // La llave temporal para el paso final
+  
+  expiresAt  DateTime
+  createdAt  DateTime @default(now())
+}
+
+// ==========================================================
+// 3. MODELO DE CHECK-IN DIGITAL
+// ==========================================================
+model Checkin {
+  id            Int           @id @default(autoincrement())
+  
+  reservationId String        @unique 
+  reservation   Reservation   @relation("ReservationCheckin", fields: [reservationId], references: [reservationId])
+  
+  checkinStatus CheckinStatus @default(EN_PROCESO) 
+  
+  // Datos OCR
+  guestName     String?
+  documentType  String?
+  documentNumber String?
+  
+  // 🛑 CORRECCIÓN: Nombres alineados con checkin_controller.js
+  documentPhoto String? // Antes documentImageUrl
+  selfiePhoto   String? // Antes selfieImageUrl
+  verifiedAt    DateTime?     // Fecha y hora de la verificación de identidad
+  completedAt    DateTime?
+  // Firma
+  signatureImageUrl String? // URL si la subimos a S3
+  signatureBase64   String? @db.Text // Base64 crudo (Backup)
+  acceptedTerms     Boolean @default(false)
+
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+}
+
+enum CheckinStatus {
+  PENDIENTE
+  INICIADO // Agregado para el paso 1 (validate)
+  EN_PROCESO
+  IDENTIDAD_VERIFICADA
+  COMPLETADO
+  FALLIDO
+}
+
+// ==========================================================
+// 4. MODELO DE RESERVA
+// ==========================================================
+model Reservation {
+  id            Int      @id @default(autoincrement())
+  reservationId String   @unique // ID público (ej: "RES-1234")
+  
+  bookingEmail  String   
+  propertyName  String 
+  // Datos del huésped principal (copia por si el usuario no existe aún)
+  guestName     String? // Usamos guestName en controllers, aquí tenías nombre/apellido separados
+  nombre        String? // Mantenemos por compatibilidad
+  apellido      String? // Mantenemos por compatibilidad
+  
+  checkInDate   DateTime
+  checkOutDate  DateTime
+  guests        Int
+  totalPrice    Float    @default(0.0)
+  location      String?  // Agregado por si acaso
+  latitude       Float?
+  longitude      Float?
+  propertyUrl     String?  // Aquí guardaremos el enlace de Turisgal
+  
+  // También sería útil esta para el inventario si decides guardarlo como texto
+  inventory       Json?    // Opcional: para guardar el inventario procesado 
+  
+  // Relación con Usuario (Opcional, si el usuario ya se registró)
+  userId        Int?
+  user          User?    @relation(fields: [userId], references: [id])
+  
+  checkinProcess Checkin? @relation("ReservationCheckin")
+  status         ReservationStatus @default(PENDIENTE_INICIO) 
+
+  // CHECK-OUT
+  uploadedPhotos String[]  @default([]) // Array de strings (Postgres)
+  incidents      String?   @db.Text
+  checkOutCompletedAt DateTime? 
+  checkOutDateReal    DateTime? // Fecha real de salida
+
+  // EXTRAS
+  messages       ChatMessage[] 
+  review         Review?
+
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+enum ReservationStatus {
+  PENDIENTE          // Agregado para compatibilidad
+  PENDIENTE_INICIO 
+  REGISTRO_COMPLETADO 
+  PENDIENTE_REVISION 
+  COMPLETADA 
+  CANCELADA 
+  CONFIRMADA
+}
+
+// ==========================================================
+// 5. MODELO DE CHAT
+// ==========================================================
+model ChatMessage {
+  id            Int      @id @default(autoincrement())
+  
+  reservationId String
+  reservation   Reservation @relation(fields: [reservationId], references: [reservationId])
+
+  senderId      String   // ID del usuario o "support"
+  senderName    String
+  text          String   @db.Text
+  
+  createdAt     DateTime @default(now())
+
+  // Relación opcional con User (útil para saber quién escribió)
+  userId        Int?
+  user          User?    @relation(fields: [userId], references: [id])
+}
+
+// ==========================================================
+// 6. MODELO DE RESEÑA
+// ==========================================================
+model Review {
+  id            Int      @id @default(autoincrement())
+
+  reservationId String   @unique
+  reservation   Reservation @relation(fields: [reservationId], references: [reservationId])
+  
+  userId        Int
+  user          User     @relation(fields: [userId], references: [id])
+  
+  rating        Int
+  comment       String?  @db.Text
+  
+  createdAt     DateTime @default(now()) // Renombrado de submissionDate a createdAt (estándar)
+}
